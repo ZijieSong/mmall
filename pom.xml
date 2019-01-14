@@ -110,7 +110,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.6</version>
+      <version>5.1.25</version>
     </dependency>
 
     <dependency>
@@ -177,6 +177,15 @@
       <artifactId>commons-io</artifactId>
       <version>2.0.1</version>
     </dependency>
+
+
+    <!-- druid -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid</artifactId>
+      <version>1.0.7</version>
+    </dependency>
+
 
 
 
