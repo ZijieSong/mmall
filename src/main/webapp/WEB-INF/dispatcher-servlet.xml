@@ -45,6 +45,7 @@
         <mvc:interceptor>
             <mvc:mapping path="/manage/**"/>
             <mvc:exclude-mapping path="/manage/user/**"/>
+            <mvc:exclude-mapping path="/manage/product/richtext_img_upload.do"/>
             <bean class="com.mmall.interceptors.RoleValidate"/>
         </mvc:interceptor>
     </mvc:interceptors>
