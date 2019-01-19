@@ -25,7 +25,7 @@ public class UserManageController {
         ServerResponse<User> response = userService.login(username, password);
         if(!response.isSuccess())
             return response;
-        if(response.getData().getRole() != Const.role.ROLE_ADMIN)
+        if(response.getData().getRole() != Const.Role.ROLE_ADMIN)
             return ServerResponse.fail("该用户不是管理员，无法登陆");
         session.setAttribute(Const.CURRENT_USER,response.getData());
         return response;

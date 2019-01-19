@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
             return ServerResponse.fail( "用户名已存在");
         if(!checkValid(user.getEmail(),Const.EMAIL).isSuccess())
             return ServerResponse.fail("邮箱已存在");
-        user.setRole(Const.role.ROLE_CUSTOMER);
+        user.setRole(Const.Role.ROLE_CUSTOMER);
         user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
         if(userMapper.insertSelective(user)<1)
             return ServerResponse.fail("注册失败");
@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ServerResponse checkRole(User user) {
-        if(user!=null && user.getRole() == Const.role.ROLE_ADMIN)
+        if(user!=null && user.getRole() == Const.Role.ROLE_ADMIN)
             return ServerResponse.success();
         return ServerResponse.fail();
     }

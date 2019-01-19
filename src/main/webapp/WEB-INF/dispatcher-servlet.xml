@@ -48,6 +48,10 @@
             <mvc:exclude-mapping path="/manage/product/richtext_img_upload.do"/>
             <bean class="com.mmall.interceptors.RoleValidate"/>
         </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/cart/**"/>
+            <bean class="com.mmall.interceptors.LoginValidate"/>
+        </mvc:interceptor>
     </mvc:interceptors>
 
 </beans>
