@@ -15,6 +15,16 @@ public class Const {
         int ROLE_ADMIN = 0;//管理员
     }
 
+    public interface CheckStatus{
+        int CHECKED = 1;
+        int UNCHECKED = 0;
+    }
+
+    public interface LimitStatus{
+        String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";
+        String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
+    }
+
     public interface OrderBy{
         Set<String> orderByPrice = Sets.newHashSet("price_desc","price_asc");
     }
