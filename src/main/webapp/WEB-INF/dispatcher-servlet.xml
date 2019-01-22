@@ -50,6 +50,7 @@
         </mvc:interceptor>
         <mvc:interceptor>
             <mvc:mapping path="/cart/**"/>
+            <mvc:mapping path="/shipping/**"/>
             <bean class="com.mmall.interceptors.LoginValidate"/>
         </mvc:interceptor>
     </mvc:interceptors>
