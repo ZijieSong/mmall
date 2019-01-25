@@ -1,12 +1,14 @@
 package com.mmall.controller.backend;
 
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
 import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.Product;
 import com.mmall.pojo.User;
 import com.mmall.service.FileService;
 import com.mmall.service.ProductService;
+import com.mmall.util.FTPUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.ProductDetailVO;
 import org.apache.commons.lang3.StringUtils;
@@ -66,9 +68,15 @@ public class ProductManageController {
 
     @RequestMapping("upload.do")
     @ResponseBody
-    public ServerResponse<String> upload(HttpServletRequest request, MultipartFile file){
+    public ServerResponse<Map> upload(HttpServletRequest request, MultipartFile file){
         String localPath = request.getSession().getServletContext().getRealPath("upload");
-        return ServerResponse.successByData(fileService.upload(file,localPath));
+        String fileName = fileService.upload(file,localPath);
+        if(StringUtils.isBlank(fileName))
+            return ServerResponse.fail("上传失败");
+        Map<String, String> result = Maps.newHashMap();
+        result.put("uri",fileName);
+        result.put("url",PropertiesUtil.get("ftp.server.http.prefix")+fileName);
+        return ServerResponse.successByData(result);
     }
 
     @RequestMapping("richtext_img_upload.do")

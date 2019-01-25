@@ -137,7 +137,7 @@ public class ProductServiceImpl implements ProductService {
             productName = "%" + productName + "%";
 
         //开启分页
-        PageHelper.startPage(pageNum, pageSize);
+            PageHelper.startPage(pageNum, pageSize);
         //开启排序,注意填写规则为 数据库字段名+空格+desc/asc
         if(StringUtils.isNotBlank(sort)){
             if(Const.OrderBy.orderByPrice.contains(sort))
