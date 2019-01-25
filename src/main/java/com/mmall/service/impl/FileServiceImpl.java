@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mmall.common.ServerResponse;
 import com.mmall.service.FileService;
 import com.mmall.util.FTPUtil;
+import com.mmall.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class FileServiceImpl implements FileService {
         }
 
         //上传到ftp服务器上
-        if(!FTPUtil.uploadFiles(Lists.newArrayList(targetFile),"image"))
+        if(!FTPUtil.uploadFiles(Lists.newArrayList(targetFile),PropertiesUtil.get("ftpfile.upload.remote")))
             return null;
 
         //删除本地文件

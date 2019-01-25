@@ -48,4 +48,59 @@ public class Const {
             return msg;
         }
     }
+
+    public interface AlipayCallback{
+        String ALIPAY_CALLBACK_SUCCESS = "success";
+        String ALIPAY_CALLBACK_FAILED = "failed";
+
+        String ALIPAY_CALLBACK_STATUS_WAITPAY = "WAIT_BUYER_PAY";
+        String ALIPAY_CALLBACK_STATUS_PAYSUCCESS = "TRADE_SUCCESS";
+    }
+
+    public enum OrderStatus{
+        CANCELED(0,"已取消"),
+        NO_PAY(10,"未支付"),
+        PAID(20,"已付款"),
+        SHIPPED(40,"已发货"),
+        ORDER_SUCCESS(50,"订单完成"),
+        ORDER_CLOSE(60,"订单关闭");
+
+        int value;
+        String status;
+
+        OrderStatus(int value, String status) {
+            this.value = value;
+            this.status = status;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+    }
+
+    public enum PayPlatform{
+        ZHIFUBAO(1,"支付宝"),
+        WEICHAT(2,"微信")
+        ;
+        int value;
+        String plat;
+
+        public int getValue() {
+            return value;
+        }
+
+        public String getPlat() {
+            return plat;
+        }
+
+        PayPlatform(int value, String plat) {
+
+            this.value = value;
+            this.plat = plat;
+        }
+    }
 }

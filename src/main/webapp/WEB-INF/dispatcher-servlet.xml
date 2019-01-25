@@ -51,6 +51,8 @@
         <mvc:interceptor>
             <mvc:mapping path="/cart/**"/>
             <mvc:mapping path="/shipping/**"/>
+            <mvc:mapping path="/order/**"/>
+            <mvc:exclude-mapping path="/order/alipay_callback.do"/>
             <bean class="com.mmall.interceptors.LoginValidate"/>
         </mvc:interceptor>
     </mvc:interceptors>
