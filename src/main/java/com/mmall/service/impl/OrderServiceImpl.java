@@ -156,7 +156,8 @@ OrderServiceImpl implements OrderService {
                 ZxingUtils.getQRCodeImge(response.getQrCode(), 256, filePath);
 
                 //上传到ftp服务器
-                FTPUtil.uploadFiles(Lists.newArrayList(targetFile), PropertiesUtil.get("ftpfile.upload.remote"));
+                if(!FTPUtil.uploadFiles(Lists.newArrayList(targetFile), PropertiesUtil.get("ftpfile.upload.remote")))
+                    return ServerResponse.fail("二维码上传失败");
 
                 //删除本地文件
                 targetFile.delete();
