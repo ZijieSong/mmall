@@ -2,6 +2,7 @@ package com.mmall.common;
 
 import com.google.common.collect.Sets;
 
+import java.util.Arrays;
 import java.util.Set;
 
 public class Const {
@@ -15,22 +16,22 @@ public class Const {
         int ROLE_ADMIN = 0;//管理员
     }
 
-    public interface CheckStatus{
+    public interface CheckStatus {
         int CHECKED = 1;
         int UNCHECKED = 0;
     }
 
-    public interface LimitStatus{
+    public interface LimitStatus {
         String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";
         String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
     }
 
-    public interface OrderBy{
-        Set<String> orderByPrice = Sets.newHashSet("price_desc","price_asc");
+    public interface OrderBy {
+        Set<String> orderByPrice = Sets.newHashSet("price_desc", "price_asc");
     }
 
-    public enum ProductStatus{
-        ON_SALE(1,"在售");
+    public enum ProductStatus {
+        ON_SALE(1, "在售");
 
         private int status;
         private String msg;
@@ -49,7 +50,7 @@ public class Const {
         }
     }
 
-    public interface AlipayCallback{
+    public interface AlipayCallback {
         String ALIPAY_CALLBACK_SUCCESS = "success";
         String ALIPAY_CALLBACK_FAILED = "failed";
 
@@ -57,13 +58,13 @@ public class Const {
         String ALIPAY_CALLBACK_STATUS_PAYSUCCESS = "TRADE_SUCCESS";
     }
 
-    public enum OrderStatus{
-        CANCELED(0,"已取消"),
-        NO_PAY(10,"未支付"),
-        PAID(20,"已付款"),
-        SHIPPED(40,"已发货"),
-        ORDER_SUCCESS(50,"订单完成"),
-        ORDER_CLOSE(60,"订单关闭");
+    public enum OrderStatus {
+        CANCELED(0, "已取消"),
+        NO_PAY(10, "未支付"),
+        PAID(20, "已付款"),
+        SHIPPED(40, "已发货"),
+        ORDER_SUCCESS(50, "订单完成"),
+        ORDER_CLOSE(60, "订单关闭");
 
         int value;
         String status;
@@ -80,12 +81,19 @@ public class Const {
         public String getStatus() {
             return status;
         }
+
+        public static OrderStatus getOrderStatusFromValue(int value){
+            for(OrderStatus orderStatus : values()){
+                if(orderStatus.getValue() == value)
+                    return orderStatus;
+            }
+            return null;
+        }
     }
 
-    public enum PayPlatform{
-        ZHIFUBAO(1,"支付宝"),
-        WEICHAT(2,"微信")
-        ;
+    public enum PayPlatform {
+        ZHIFUBAO(1, "支付宝"),
+        WEICHAT(2, "微信");
         int value;
         String plat;
 
@@ -103,4 +111,36 @@ public class Const {
             this.plat = plat;
         }
     }
+
+    public enum PaymentType {
+        ONLINE_PAY(1, "在线支付");
+
+        int value;
+        String des;
+
+        public int getValue() {
+            return value;
+        }
+
+        public String getDes() {
+            return des;
+        }
+
+
+        PaymentType(int value, String des) {
+
+            this.value = value;
+            this.des = des;
+        }
+
+        public static PaymentType getEnumFromCode(int value) {
+            for (PaymentType paymentType : values()) {
+                if (paymentType.getValue() == value)
+                    return paymentType;
+            }
+            return null;
+        }
+    }
+
+
 }

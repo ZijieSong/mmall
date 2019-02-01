@@ -57,8 +57,8 @@
         </if>
         <if test="categoryIdList!=null">
             and category_id in
---             此处含义是迭代collection，item是每个元素，index是索引，下面三个分别代表左中右，其间通过#{item}填充
-            <foreach collection="categoryIdList" item = "item" index="index"
+            -- 此处含义是迭代collection，item是每个元素，index是索引，下面三个分别代表左中右，其间通过#{item}填充
+            <foreach collection="categoryIdList" item="item" index="index"
                      open="(" separator="," close=")">
                 #{item}
             </foreach>
@@ -213,4 +213,23 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+    <update id="updateBatch">
+        update mmall_product
+        <set>
+            <trim prefix="stock=case" suffix="end,">
+                <foreach collection="productList" index="index" item="item">
+                    <if test="item.stock!=null">
+                        when id = #{item.id} then #{item.stock}
+                    </if>
+                    <if test="item.stock==null">
+                        when id = #{item.id} then mmall_product.stock
+                    </if>
+                </foreach>
+            </trim>
+        </set>
+        where id in
+        <foreach collection="productList" index="index" item="item" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+    </update>
 </mapper>

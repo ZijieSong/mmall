@@ -1,5 +1,6 @@
 package com.mmall.controller;
 
+import com.mmall.service.CartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -7,11 +8,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @Controller
 public class netappTest extends BaseController{
+    @Resource
+    private CartService cartService;
 
     private static Logger logger =LoggerFactory.getLogger(netappTest.class);
 
@@ -33,4 +39,29 @@ public class netappTest extends BaseController{
         String value = request.getParameter("id");
         return;
     }
+
+    @RequestMapping("/mmall/cookpath.do")
+    @ResponseBody
+    public void cookPath(HttpServletResponse response){
+        Cookie cookie = new Cookie("test","szj");
+        cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+
+    @RequestMapping("/mmall/getCookie.do")
+    @ResponseBody
+    public void getCookie(HttpServletRequest request){
+        Cookie[] cookies = request.getCookies();
+        for(Cookie c: cookies)
+            System.out.println(c.getName()+":"+c.getValue());
+    }
+
+    @RequestMapping("/mall/getCookie.do")
+    @ResponseBody
+    public void getCookieMa(HttpServletRequest request){
+        Cookie[] cookies = request.getCookies();
+        for(Cookie c: cookies)
+            System.out.println(c.getName()+":"+c.getValue());
+    }
+
 }

@@ -1,14 +1,18 @@
 package com.mmall.controller.portal;
 
+import com.alipay.api.domain.UseRule;
 import com.google.common.collect.Maps;
 import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
+import com.mmall.pojo.Shipping;
 import com.mmall.pojo.User;
 import com.mmall.service.OrderService;
+import net.sf.jsqlparser.schema.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
@@ -74,10 +78,48 @@ public class OrderController {
 
     @RequestMapping("query_order_pay_status.do")
     @ResponseBody
-    public ServerResponse<Boolean> queryOrderPayStatus(HttpSession session, Long orderNo){
+    public ServerResponse<Boolean> queryOrderPayStatus(HttpSession session, Long orderNo) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if(orderService.payedStatus(user.getId(),orderNo).isSuccess())
+        if (orderService.payedStatus(user.getId(), orderNo).isSuccess())
             return ServerResponse.successByData(true);
         return ServerResponse.successByData(false);
+    }
+
+
+    @RequestMapping("create.do")
+    @ResponseBody
+    public ServerResponse createOrder(HttpSession session, Integer shippingId) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        return orderService.createOrder(user.getId(), shippingId);
+    }
+
+    @RequestMapping("cancel.do")
+    @ResponseBody
+    public ServerResponse cancel(HttpSession session, Long orderNo) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        return orderService.cancel(user.getId(), orderNo);
+    }
+
+    @RequestMapping("get_order_cart_product.do")
+    @ResponseBody
+    public ServerResponse getOrderCartProduct(HttpSession session) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        return orderService.getOrderProductDetail(user.getId());
+    }
+
+    @RequestMapping("detail.do")
+    @ResponseBody
+    public ServerResponse detail(HttpSession session, Long orderNo) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        return orderService.detail(user.getId(), orderNo);
+    }
+
+    @RequestMapping("list.do")
+    @ResponseBody
+    public ServerResponse list(HttpSession session,
+                               @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        return orderService.list(user.getId(), pageNum,pageSize);
     }
 }

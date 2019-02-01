@@ -7,6 +7,8 @@ import com.mmall.common.ServerResponse;
 import com.mmall.dao.ShippingMapper;
 import com.mmall.pojo.Shipping;
 import com.mmall.service.ShippingService;
+import com.mmall.vo.ShippingVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

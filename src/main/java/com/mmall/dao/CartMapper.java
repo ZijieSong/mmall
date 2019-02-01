@@ -29,4 +29,8 @@ public interface CartMapper {
     int updateCheckStatus(@Param("userId") Integer userId, @Param("productId") Integer productId, @Param("checkStatus") Integer checkStatus);
 
     int getTotalQuantity(Integer userId);
+
+    List<Cart> selectCheckedByUserId(Integer userId);
+
+    int deleteBatch(@Param("cartIdList") List<Integer> cartIdList);
 }
