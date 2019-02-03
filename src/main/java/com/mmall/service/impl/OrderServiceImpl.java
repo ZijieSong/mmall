@@ -197,7 +197,7 @@ public class OrderServiceImpl implements OrderService {
         params.remove("sign_type");
 
         try {
-            return AlipaySignature.rsaCheckV2(params, Configs.getPublicKey(), "utf-8", Configs.getSignType());
+            return AlipaySignature.rsaCheckV2(params, Configs.getAlipayPublicKey(), "utf-8", Configs.getSignType());
         } catch (AlipayApiException e) {
             log.error("验签异常");
             return false;
