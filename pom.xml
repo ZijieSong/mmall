@@ -293,7 +293,45 @@
       </plugin>
     </plugins>
 
+
+    <resources>
+      <resource>
+        <!--引入不同环境私有的配置文件-->
+        <directory>src/main/resources.${deploy.type}</directory>
+        <excludes>
+          <exclude>*.jsp</exclude>
+        </excludes>
+      </resource>
+      <!--引入不同环境公共的配置文件-->
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
+
   </build>
 
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <deploy.type>dev</deploy.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>test</id>
+      <properties>
+        <deploy.type>test</deploy.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>prod</id>
+      <properties>
+        <deploy.type>prod</deploy.type>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>
