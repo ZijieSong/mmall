@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class DateUtil {
 
-    private static String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     public static Date getDateFromStr(String str) {
         return getDateFromStr(str, DEFAULT_PATTERN);
