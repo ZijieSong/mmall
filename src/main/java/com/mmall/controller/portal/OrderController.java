@@ -3,6 +3,7 @@ package com.mmall.controller.portal;
 import com.alipay.api.domain.UseRule;
 import com.google.common.collect.Maps;
 import com.mmall.common.Const;
+import com.mmall.common.HostHolder;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.Shipping;
 import com.mmall.pojo.User;
@@ -10,6 +11,7 @@ import com.mmall.service.OrderService;
 import net.sf.jsqlparser.schema.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,13 +29,15 @@ public class OrderController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
+    @Autowired
+    HostHolder hostHolder;
     @Resource(name = "orderService")
     private OrderService orderService;
 
     @RequestMapping("pay.do")
     @ResponseBody
-    public ServerResponse pay(HttpSession session, HttpServletRequest request, Long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse pay(HttpServletRequest request, Long orderNo) {
+        User user = hostHolder.getUser();
         String localPath = request.getSession().getServletContext().getRealPath("upload");
         return orderService.getOrderQRURL(user.getId(), orderNo, localPath);
     }
@@ -78,8 +82,8 @@ public class OrderController {
 
     @RequestMapping("query_order_pay_status.do")
     @ResponseBody
-    public ServerResponse<Boolean> queryOrderPayStatus(HttpSession session, Long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<Boolean> queryOrderPayStatus(Long orderNo) {
+        User user = hostHolder.getUser();
         if (orderService.payedStatus(user.getId(), orderNo).isSuccess())
             return ServerResponse.successByData(true);
         return ServerResponse.successByData(false);
@@ -88,38 +92,37 @@ public class OrderController {
 
     @RequestMapping("create.do")
     @ResponseBody
-    public ServerResponse createOrder(HttpSession session, Integer shippingId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse createOrder(Integer shippingId) {
+        User user = hostHolder.getUser();
         return orderService.createOrder(user.getId(), shippingId);
     }
 
     @RequestMapping("cancel.do")
     @ResponseBody
-    public ServerResponse cancel(HttpSession session, Long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse cancel(Long orderNo) {
+        User user = hostHolder.getUser();
         return orderService.cancel(user.getId(), orderNo);
     }
 
     @RequestMapping("get_order_cart_product.do")
     @ResponseBody
-    public ServerResponse getOrderCartProduct(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse getOrderCartProduct() {
+        User user = hostHolder.getUser();
         return orderService.getOrderProductDetail(user.getId());
     }
 
     @RequestMapping("detail.do")
     @ResponseBody
-    public ServerResponse detail(HttpSession session, Long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse detail(Long orderNo) {
+        User user = hostHolder.getUser();
         return orderService.detail(user.getId(), orderNo);
     }
 
     @RequestMapping("list.do")
     @ResponseBody
-    public ServerResponse list(HttpSession session,
-                               @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+    public ServerResponse list(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        User user = hostHolder.getUser();
         return orderService.list(user.getId(), pageNum,pageSize);
     }
 }

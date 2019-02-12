@@ -16,6 +16,16 @@ public class Const {
         int ROLE_ADMIN = 0;//管理员
     }
 
+    public interface RedisKey{
+        String LOGIN_TOKEN_PREFIX = "LOGIN_TOKEN:";
+        String RESET_PASSWORD_PREFIX = "PASS_RESET_TOKEN:";
+    }
+
+    public interface EXPIRE_TIME{
+        int LOGIN_TOKEN_EXPIRE = 60*30;
+        int PASSRESET_TOKEN_EXPIRE = 60*60*12;
+    }
+
     public interface CheckStatus {
         int CHECKED = 1;
         int UNCHECKED = 0;

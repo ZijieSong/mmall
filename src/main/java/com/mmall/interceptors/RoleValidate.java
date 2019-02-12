@@ -1,10 +1,15 @@
 package com.mmall.interceptors;
 
 import com.mmall.common.Const;
+import com.mmall.common.HostHolder;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.UserService;
+import com.mmall.util.CookieUtil;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisUtil;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -15,6 +20,8 @@ import javax.servlet.http.HttpSession;
 
 public class RoleValidate implements HandlerInterceptor {
 
+    @Autowired
+    HostHolder hostHolder;
     @Resource(name = "userService")
     private UserService userService;
 
@@ -22,21 +29,24 @@ public class RoleValidate implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
 
         httpServletResponse.setContentType("application/json; charset=utf-8");
-        httpServletResponse.setCharacterEncoding("utf-8");
 
-        HttpSession session = httpServletRequest.getSession();
-        User user = (User)session.getAttribute(Const.CURRENT_USER);
-        if(user == null){
-            ServerResponse serverResponse = ServerResponse.fail("用户需登录");
-            httpServletResponse.getWriter().write(new ObjectMapper().writeValueAsString(serverResponse));
-            return false;
+        String loginToken = CookieUtil.readLoginToken(httpServletRequest);
+        if(loginToken!=null){
+            User user = JsonUtil.stringToObject(RedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX+loginToken),User.class);
+            if(user!=null){
+                if(userService.checkRole(user).isSuccess()){
+                    hostHolder.addUser(user);
+                    return true;
+                }else{
+                    ServerResponse serverResponse = ServerResponse.fail("用户无权限");
+                    httpServletResponse.getWriter().write(JsonUtil.objToString(serverResponse));
+                    return false;
+                }
+            }
         }
-        if(!userService.checkRole(user).isSuccess()){
-            ServerResponse serverResponse = ServerResponse.fail("用户无权限");
-            httpServletResponse.getWriter().write(new ObjectMapper().writeValueAsString(serverResponse));
-            return false;
-        }
-        return true;
+        ServerResponse serverResponse = ServerResponse.fail("用户需登录");
+        httpServletResponse.getWriter().write(JsonUtil.objToString(serverResponse));
+        return false;
     }
 
     @Override
@@ -46,6 +56,6 @@ public class RoleValidate implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-
+        hostHolder.removeUser();
     }
 }

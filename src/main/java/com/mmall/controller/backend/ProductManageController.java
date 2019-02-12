@@ -8,8 +8,7 @@ import com.mmall.pojo.Product;
 import com.mmall.pojo.User;
 import com.mmall.service.FileService;
 import com.mmall.service.ProductService;
-import com.mmall.util.FTPUtil;
-import com.mmall.util.PropertiesUtil;
+import com.mmall.util.*;
 import com.mmall.vo.ProductDetailVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -84,7 +84,13 @@ public class ProductManageController {
     public Map<String, Object> richtextImgUpload(HttpServletRequest request, HttpServletResponse response,
                                                  MultipartFile file){
         Map<String, Object> map = new HashMap<>();
-        User user = (User) request.getSession().getAttribute(Const.CURRENT_USER);
+        String loginToken = CookieUtil.readLoginToken(request);
+        if(loginToken == null){
+            map.put("success", false);
+            map.put("msg","用户需登陆");
+            return map;
+        }
+        User user = JsonUtil.stringToObject(RedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX+loginToken),User.class);
         if(user == null){
             map.put("success", false);
             map.put("msg","用户需登陆");
