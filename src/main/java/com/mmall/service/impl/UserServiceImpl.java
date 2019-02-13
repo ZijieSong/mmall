@@ -7,7 +7,7 @@ import com.mmall.dao.UserMapper;
 import com.mmall.pojo.User;
 import com.mmall.service.UserService;
 import com.mmall.util.MD5Util;
-import com.mmall.util.RedisUtil;
+import com.mmall.util.ShardedRedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
         if(userMapper.selectAnswerCount(username, question, answer)<1)
             return ServerResponse.fail("问题答案错误");
         String token = UUID.randomUUID().toString();
-        RedisUtil.setex(Const.RedisKey.RESET_PASSWORD_PREFIX+username, token, Const.EXPIRE_TIME.PASSRESET_TOKEN_EXPIRE);
+        ShardedRedisUtil.setex(Const.RedisKey.RESET_PASSWORD_PREFIX+username, token, Const.EXPIRE_TIME.PASSRESET_TOKEN_EXPIRE);
         return ServerResponse.successByData(token);
     }
 
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
             return ServerResponse.fail("用户不存在");
         if(StringUtils.isBlank(token))
             return ServerResponse.fail("token入参失败");
-        if(!StringUtils.equals(token,RedisUtil.get(Const.RedisKey.RESET_PASSWORD_PREFIX+username)))
+        if(!StringUtils.equals(token,ShardedRedisUtil.get(Const.RedisKey.RESET_PASSWORD_PREFIX+username)))
             return ServerResponse.fail("token无效");
         User user = new User();
         user.setUsername(username);

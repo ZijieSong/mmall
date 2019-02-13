@@ -90,7 +90,7 @@ public class ProductManageController {
             map.put("msg","用户需登陆");
             return map;
         }
-        User user = JsonUtil.stringToObject(RedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX+loginToken),User.class);
+        User user = JsonUtil.stringToObject(ShardedRedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX+loginToken),User.class);
         if(user == null){
             map.put("success", false);
             map.put("msg","用户需登陆");

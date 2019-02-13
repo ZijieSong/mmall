@@ -7,8 +7,7 @@ import com.mmall.pojo.User;
 import com.mmall.service.UserService;
 import com.mmall.util.CookieUtil;
 import com.mmall.util.JsonUtil;
-import com.mmall.util.RedisUtil;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.mmall.util.ShardedRedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -16,7 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 public class RoleValidate implements HandlerInterceptor {
 
@@ -32,7 +30,7 @@ public class RoleValidate implements HandlerInterceptor {
 
         String loginToken = CookieUtil.readLoginToken(httpServletRequest);
         if(loginToken!=null){
-            User user = JsonUtil.stringToObject(RedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX+loginToken),User.class);
+            User user = JsonUtil.stringToObject(ShardedRedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX+loginToken),User.class);
             if(user!=null){
                 if(userService.checkRole(user).isSuccess()){
                     hostHolder.addUser(user);

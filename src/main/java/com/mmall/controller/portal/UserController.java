@@ -1,13 +1,12 @@
 package com.mmall.controller.portal;
 
 import com.mmall.common.Const;
-import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.UserService;
 import com.mmall.util.CookieUtil;
 import com.mmall.util.JsonUtil;
-import com.mmall.util.RedisUtil;
+import com.mmall.util.ShardedRedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +41,7 @@ public class UserController {
         if (serverResponse.isSuccess()) {
 //            session.setAttribute(Const.CURRENT_USER,serverResponse.getData());
             String userJson = JsonUtil.objToString(serverResponse.getData());
-            RedisUtil.setex(Const.RedisKey.LOGIN_TOKEN_PREFIX + session.getId(), userJson, Const.EXPIRE_TIME.LOGIN_TOKEN_EXPIRE);
+            ShardedRedisUtil.setex(Const.RedisKey.LOGIN_TOKEN_PREFIX + session.getId(), userJson, Const.EXPIRE_TIME.LOGIN_TOKEN_EXPIRE);
             log.info("redis:key:{},value:{}",session.getId(),userJson);
             CookieUtil.generateLoginCookie(servletResponse, session.getId());
         }
@@ -61,7 +60,7 @@ public class UserController {
 //        session.removeAttribute(Const.CURRENT_USER);
         String loginToken = CookieUtil.readLoginToken(request);
         if (loginToken != null) {
-            RedisUtil.del(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken);
+            ShardedRedisUtil.del(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken);
             CookieUtil.delLoginToken(request, response);
         }
         return ServerResponse.success();
@@ -86,7 +85,7 @@ public class UserController {
 //        User user = (User)session.getAttribute(Const.CURRENT_USER);
         String loginToken = CookieUtil.readLoginToken(request);
         if (loginToken != null) {
-            User user = JsonUtil.stringToObject(RedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken), User.class);
+            User user = JsonUtil.stringToObject(ShardedRedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken), User.class);
             if (user != null)
                 return ServerResponse.successByData(user);
         }
@@ -116,7 +115,7 @@ public class UserController {
     public ServerResponse resetPassword(String oldPassword, String newPassword, HttpServletRequest request) {
         String loginToken = CookieUtil.readLoginToken(request);
         if (loginToken != null) {
-            User user = JsonUtil.stringToObject(RedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken), User.class);
+            User user = JsonUtil.stringToObject(ShardedRedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken), User.class);
             if (user != null)
                 return userService.resetPassword(oldPassword, newPassword, user);
         }
@@ -128,7 +127,7 @@ public class UserController {
     public ServerResponse<User> updateInformation(HttpServletRequest request, User user) {
         String loginToken = CookieUtil.readLoginToken(request);
         if (loginToken != null) {
-            User currentUser = JsonUtil.stringToObject(RedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken), User.class);
+            User currentUser = JsonUtil.stringToObject(ShardedRedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken), User.class);
             if (currentUser != null) {
                 user.setId(currentUser.getId());
                 user.setUsername(currentUser.getUsername());
@@ -136,7 +135,7 @@ public class UserController {
                 if (!serverResponse.isSuccess())
                     return serverResponse;
                 //更新成功在session中添加新的用户信息
-                RedisUtil.setex(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken, JsonUtil.objToString(serverResponse.getData()), Const.EXPIRE_TIME.LOGIN_TOKEN_EXPIRE);
+                ShardedRedisUtil.setex(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken, JsonUtil.objToString(serverResponse.getData()), Const.EXPIRE_TIME.LOGIN_TOKEN_EXPIRE);
                 return serverResponse;
             }
         }
@@ -148,7 +147,7 @@ public class UserController {
     public ServerResponse<User> getInformation(HttpServletRequest request) {
         String loginToken = CookieUtil.readLoginToken(request);
         if (loginToken != null) {
-            User user = JsonUtil.stringToObject(RedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken), User.class);
+            User user = JsonUtil.stringToObject(ShardedRedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX + loginToken), User.class);
             if (user != null)
                 return userService.getInformation(user.getId());
         }
