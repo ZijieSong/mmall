@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.Map;
 
 
-@Controller
+//@Controller
 public class BaseController {
 
     private static Logger logger = LoggerFactory.getLogger(BaseController.class);

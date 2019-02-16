@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-@Controller
+//@Controller
 public class netappTest extends BaseController{
     @Resource
     private CartService cartService;

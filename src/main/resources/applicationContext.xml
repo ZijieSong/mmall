@@ -9,9 +9,12 @@
      http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-    <context:component-scan base-package="com.mmall" annotation-config="true"/>
+    <!--component-scan扫描注解并注册为bean，而annotation-config是激活注册的bean-->
+    <context:component-scan base-package="com.mmall" annotation-config="true">
+        <!--spring容器只扫描controller以外的注解-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
-    <!--<context:annotation-config/>-->
     <aop:aspectj-autoproxy/>
 
 
