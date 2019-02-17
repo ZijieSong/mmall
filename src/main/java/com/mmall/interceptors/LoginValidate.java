@@ -37,7 +37,7 @@ public class LoginValidate implements HandlerInterceptor {
         String methodName = handlerMethod.getMethod().getName();
 
         Map<String, String[]> requestParams = httpServletRequest.getParameterMap();
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         requestParams.forEach((k, v) -> sb.append(k).append("=").append(Arrays.toString(v)).append(";"));
 
         if (StringUtils.equals(className, "UserController") && StringUtils.equals(methodName, "login")) {

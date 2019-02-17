@@ -44,7 +44,7 @@ public class RoleValidate implements HandlerInterceptor {
         String methodName = handlerMethod.getMethod().getName();
 
         Map<String, String[]> requestParameters = httpServletRequest.getParameterMap();
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         requestParameters.forEach((k, v) -> sb.append(k).append("=").append(Arrays.toString(v)).append(";"));
 
         if (StringUtils.equals(className, "UserManageController") && StringUtils.equals(methodName, "login")) {

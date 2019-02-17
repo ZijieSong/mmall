@@ -46,6 +46,7 @@
             </if>
         </where>
     </select>
+
     <select id="selectProductsOnSale" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
@@ -57,7 +58,7 @@
         </if>
         <if test="categoryIdList!=null">
             and category_id in
-            -- 此处含义是迭代collection，item是每个元素，index是索引，下面三个分别代表左中右，其间通过#{item}填充
+            <!--此处含义是迭代collection，item是每个元素，index是索引，下面三个分别代表左中右，其间通过#{item}填充-->
             <foreach collection="categoryIdList" item="item" index="index"
                      open="(" separator="," close=")">
                 #{item}
