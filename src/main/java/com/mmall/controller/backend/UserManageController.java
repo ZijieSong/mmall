@@ -21,7 +21,7 @@ import javax.servlet.http.HttpSession;
 public class UserManageController {
 
     @Resource(name = "userService")
-    UserService userService;
+    private UserService userService;
 
     @RequestMapping(value="login.do",method = RequestMethod.POST)
     @ResponseBody

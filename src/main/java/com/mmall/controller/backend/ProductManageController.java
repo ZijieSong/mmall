@@ -84,23 +84,6 @@ public class ProductManageController {
     public Map<String, Object> richtextImgUpload(HttpServletRequest request, HttpServletResponse response,
                                                  MultipartFile file){
         Map<String, Object> map = new HashMap<>();
-        String loginToken = CookieUtil.readLoginToken(request);
-        if(loginToken == null){
-            map.put("success", false);
-            map.put("msg","用户需登陆");
-            return map;
-        }
-        User user = JsonUtil.stringToObject(ShardedRedisUtil.get(Const.RedisKey.LOGIN_TOKEN_PREFIX+loginToken),User.class);
-        if(user == null){
-            map.put("success", false);
-            map.put("msg","用户需登陆");
-            return map;
-        }
-        if(user.getRole()!=Const.Role.ROLE_ADMIN){
-            map.put("success",false);
-            map.put("msg","用户无权限");
-            return map;
-        }
         String localPath = request.getSession().getServletContext().getRealPath("upload");
         String resultStr = fileService.upload(file,localPath);
         if(StringUtils.isNotBlank(resultStr)){
