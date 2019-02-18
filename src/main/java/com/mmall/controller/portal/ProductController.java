@@ -7,6 +7,7 @@ import com.mmall.vo.ProductDetailVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,5 +39,14 @@ public class ProductController {
                                             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                             @RequestParam(value = "sort", required = false) String sort) {
         return productService.getOnSaleProductList(productName, categoryId, pageNum, pageSize, sort);
+    }
+
+    @RequestMapping("/list/product/{productName}")
+    @ResponseBody
+    public ServerResponse<PageInfo> getListRestful(@PathVariable(value = "productName") String productName,
+                                            @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+                                            @RequestParam(value = "sort", required = false) String sort) {
+        return productService.getOnSaleProductList(productName, null, pageNum, pageSize, sort);
     }
 }
