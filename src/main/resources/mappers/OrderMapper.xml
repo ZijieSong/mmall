@@ -54,6 +54,17 @@
       from mmall_order
       order by create_time desc
     </select>
+  
+  <select id="selectOrderByStatusAndCreateDate" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from mmall_order
+    where status = #{status}
+    <![CDATA[
+    and create_time <= #{createDate}
+    ]]>
+    order by create_time desc
+  </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from mmall_order
     where id = #{id,jdbcType=INTEGER}
@@ -222,5 +233,24 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateStatusBatch">
+    update mmall_order
+    <set>
+      <trim prefix="status=case" suffix="end,">
+        <foreach collection="orderList" index="index" item="item">
+          <if test="item.status!=null">
+            when id = #{item.id} then #{item.status}
+          </if>
+          <if test="item.status==null">
+            when id = #{item.id} then mmall_order.status
+          </if>
+        </foreach>
+      </trim>
+    </set>
+    where id in
+    <foreach collection="orderList" index="index" item="item" open="(" close=")" separator=",">
+      #{item.id}
+    </foreach>
   </update>
 </mapper>

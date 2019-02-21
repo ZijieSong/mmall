@@ -35,6 +35,7 @@ import com.mmall.vo.OrderVO;
 import com.mmall.vo.ShippingVO;
 import net.sf.jsqlparser.schema.Server;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -47,6 +48,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
@@ -338,18 +340,18 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orderList = orderMapper.selectOrderListByUserId(userId);
         PageInfo pageInfo = new PageInfo(orderList);
 
-        pageInfo.setList(generateOrderVOList(orderList,userId));
+        pageInfo.setList(generateOrderVOList(orderList, userId));
 
         return ServerResponse.successByData(pageInfo);
     }
 
     @Override
     public ServerResponse<PageInfo> manageOrderList(Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum,pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         List<Order> orderList = orderMapper.selectAllOrder();
         PageInfo pageInfo = new PageInfo(orderList);
 
-        pageInfo.setList(generateOrderVOList(orderList,null));
+        pageInfo.setList(generateOrderVOList(orderList, null));
 
         return ServerResponse.successByData(pageInfo);
     }
@@ -357,40 +359,70 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ServerResponse<OrderVO> manageOrderDetail(Long orderNo) {
         Order order = orderMapper.selectByOrderNo(orderNo);
-        if(order==null)
+        if (order == null)
             return ServerResponse.fail("订单不存在");
         List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(orderNo);
 
-        return ServerResponse.successByData(generateOrderVO(order,orderItemList));
+        return ServerResponse.successByData(generateOrderVO(order, orderItemList));
     }
 
     @Override
     public ServerResponse<PageInfo> manageSearch(Long orderNo, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum,pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         Order order = orderMapper.selectByOrderNo(orderNo);
-        if(order==null)
+        if (order == null)
             return ServerResponse.fail("订单不存在");
         PageInfo pageInfo = new PageInfo(Lists.newArrayList(order));
         List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(orderNo);
-        pageInfo.setList(Lists.newArrayList(generateOrderVO(order,orderItemList)));
+        pageInfo.setList(Lists.newArrayList(generateOrderVO(order, orderItemList)));
         return ServerResponse.successByData(pageInfo);
     }
 
     @Override
     public ServerResponse manageSendGoods(Long orderNo) {
         Order order = orderMapper.selectByOrderNo(orderNo);
-        if(order==null)
+        if (order == null)
             return ServerResponse.fail("订单不存在");
-        if(order.getStatus()!=Const.OrderStatus.PAID.getValue())
+        if (order.getStatus() != Const.OrderStatus.PAID.getValue())
             return ServerResponse.fail("订单状态不允许发货");
         Order updateOrder = new Order();
         updateOrder.setId(order.getId());
         updateOrder.setStatus(Const.OrderStatus.SHIPPED.getValue());
         updateOrder.setSendTime(new Date());
 
-        if(orderMapper.updateByPrimaryKeySelective(updateOrder)>0)
+        if (orderMapper.updateByPrimaryKeySelective(updateOrder) > 0)
             return ServerResponse.successByData("发货成功");
         return ServerResponse.fail("发货失败");
+    }
+
+    @Override
+    public void closeOrder(int expireHours) {
+        //分两步，第一步需要给订单中的商品库存增加，第二部需要更改订单的状态
+        Date createDate = DateUtils.addHours(new Date(), -expireHours);
+        List<Order> orderList = orderMapper.selectOrderByStatusAndCreateDate(Const.OrderStatus.NO_PAY.getValue(), DateUtil.getStrFromDate(createDate));
+        List<Product> productUpdateList = Lists.newArrayList();
+        List<Order> orderUpdateList = Lists.newArrayList();
+        orderList.forEach(order -> {
+            List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
+            orderItemList.forEach(orderItem -> {
+                Integer stock = productMapper.selectStockById(orderItem.getProductId());
+                //如果查出来的库存为null的话，说明该product不存在也就是被删除了，就不再更新它的库存
+                if(stock!=null) {
+                    Product productUpdate = new Product();
+                    productUpdate.setId(orderItem.getProductId());
+                    productUpdate.setStock(stock+orderItem.getQuantity());
+                    productUpdateList.add(productUpdate);
+                }
+            });
+            Order orderUpdate = new Order();
+            orderUpdate.setId(order.getId());
+            orderUpdate.setStatus(Const.OrderStatus.CANCELED.getValue());
+            orderUpdateList.add(orderUpdate);
+        });
+        List<Integer> productUpdateId = productUpdateList.stream().map(Product::getId).collect(Collectors.toList());
+        log.info("即将关闭订单编号:{}",Arrays.toString(productUpdateId.toArray()));
+        productMapper.updateStockBatch(productUpdateList);
+        orderMapper.updateStatusBatch(orderUpdateList);
     }
 
     private List<OrderVO> generateOrderVOList(List<Order> orderList, Integer userId) {
@@ -398,7 +430,7 @@ public class OrderServiceImpl implements OrderService {
         orderList.forEach(order -> {
             List<OrderItem> orderItemList;
             if (userId == null) {
-                orderItemList= orderItemMapper.selectByOrderNo(order.getOrderNo());
+                orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
             } else {
                 orderItemList = orderItemMapper.selectByOrderNoAndUserId(order.getOrderNo(), userId);
             }
@@ -466,11 +498,11 @@ public class OrderServiceImpl implements OrderService {
             Product product = productMapper.selectByPrimaryKey(orderItem.getProductId());
             Product updateProduct = new Product();
             updateProduct.setId(product.getId());
-            updateProduct.setStock(product.getStock()-orderItem.getQuantity());
+            updateProduct.setStock(product.getStock() - orderItem.getQuantity());
             productList.add(updateProduct);
         });
         //批量更新
-        if (productMapper.updateBatch(productList) > 0)
+        if (productMapper.updateStockBatch(productList) > 0)
             return ServerResponse.successByMsg("产品库存更新成功");
         return ServerResponse.fail("产品库存更新失败");
     }

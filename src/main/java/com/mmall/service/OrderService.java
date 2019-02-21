@@ -24,4 +24,6 @@ public interface OrderService {
     ServerResponse<OrderVO> manageOrderDetail(Long orderNo);
     ServerResponse<PageInfo> manageSearch(Long orderNo, Integer pageNum,Integer pageSize);
     ServerResponse manageSendGoods(Long orderNo);
+
+    void closeOrder(int expireHours);
 }

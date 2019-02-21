@@ -65,6 +65,12 @@
             </foreach>
         </if>
     </select>
+    <select id="selectStockById" resultType="java.lang.Integer">
+        select
+        stock
+        from mmall_product
+        where id = #{id}
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from mmall_product
     where id = #{id,jdbcType=INTEGER}
@@ -214,7 +220,7 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
-    <update id="updateBatch">
+    <update id="updateStockBatch">
         update mmall_product
         <set>
             <trim prefix="stock=case" suffix="end,">
