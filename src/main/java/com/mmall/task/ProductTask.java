@@ -75,7 +75,7 @@ public class ProductTask {
         }finally {
             if(isLock){
                 rLock.unlock();
-                log.info("{}, 成功释放锁");
+                log.info("{}, 成功释放锁", System.currentTimeMillis());
             }
         }
     }
