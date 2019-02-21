@@ -33,6 +33,7 @@ public class ProductTask {
         Long setnxResult = ShardedRedisUtil.setnx(Const.RedisLockKey.CLOSE_ORDER_LOCK, String.valueOf(System.currentTimeMillis() + lockExpireTime));
         if (setnxResult != null && (setnxResult.intValue() == 1)) {
             //成功获取锁
+            log.info("{},获取锁成功",System.currentTimeMillis());
             closeOrder(lockExpireTime);
         } else {
             //查看是否有获取锁的权利,即判断当前锁是否由于特殊原因已经达到了超时时间但是未释放锁
@@ -42,9 +43,9 @@ public class ProductTask {
                 if (tryLock(expireTime, lockExpireTime))
                     closeOrder(lockExpireTime);
                 else
-                    log.info("尝试获取过期锁失败");
+                    log.info("{},尝试获取过期锁失败",System.currentTimeMillis());
             }else
-                log.info("锁还未过期，无法获取");
+                log.info("{},锁还未过期，无法获取",System.currentTimeMillis());
         }
     }
 
@@ -55,12 +56,12 @@ public class ProductTask {
     private void closeOrder(Long lockExpireTime) {
         //首先设置锁的超时时间，防止锁由于操作抛异常而未被删除导致的死锁
         ShardedRedisUtil.expire(Const.RedisLockKey.CLOSE_ORDER_LOCK, millisToSeconds(lockExpireTime));
-        log.info("开始定时关单");
+        log.info("{},开始定时关单",System.currentTimeMillis());
 //        orderService.closeOrder(Integer.valueOf(PropertiesUtil.get("order.expireTime", "2")));
-        log.info("结束定时关单");
+        log.info("{},结束定时关单",System.currentTimeMillis());
         //释放锁
         ShardedRedisUtil.del(Const.RedisLockKey.CLOSE_ORDER_LOCK);
-        log.info("释放锁成功");
+        log.info("{},释放锁成功",System.currentTimeMillis());
     }
 
     private boolean tryLock(String oldValue, Long lockExpireTime) {
