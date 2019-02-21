@@ -58,9 +58,9 @@ public class ProductTask {
         ShardedRedisUtil.expire(Const.RedisLockKey.CLOSE_ORDER_LOCK, millisToSeconds(lockExpireTime));
         log.info("{},开始定时关单",System.currentTimeMillis());
 //        orderService.closeOrder(Integer.valueOf(PropertiesUtil.get("order.expireTime", "2")));
-        //模拟关单操作, 睡10ms
+        //模拟关单操作, 睡1s
         try {
-            Thread.sleep(10);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             log.error("sleep exception",e);
         }
