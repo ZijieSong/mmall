@@ -152,5 +152,8 @@ public class Const {
         }
     }
 
+    public interface RedisLockKey{
+        String CLOSE_ORDER_LOCK = "CLOSE_ORDER_LOCK";
+    }
 
 }
