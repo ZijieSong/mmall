@@ -68,7 +68,7 @@ public class ProductTask {
                 log.info("{},结束定时关单", System.currentTimeMillis());
             }else {
                 //不需要像v2那样比较当前时间和锁的过期时间，因为trylock是原子操作，redis中设置锁的同时也会赋予其超时时间，因此不会出现死锁
-                log.info("{},获取锁失败");
+                log.info("{},获取锁失败", System.currentTimeMillis());
             }
         } catch (InterruptedException e) {
             log.error("获取锁异常", e);
