@@ -18,7 +18,7 @@
     <bean id="defaultCookieSerializer" class="org.springframework.session.web.http.DefaultCookieSerializer">
         <property name="cookieName" value="springSession"/>
         <property name="cookieMaxAge" value="3600"/>
-        <property name="domainName" value="mmall.com"/>
+        <property name="domainName" value="36ww.cn"/>
         <property name="useHttpOnlyCookie" value="true"/>
         <property name="cookiePath" value="/"/>
     </bean>
@@ -29,7 +29,7 @@
 
     <!--设置所储存地redis的连接方式等-->
     <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-        <property name="hostName" value="10.211.55.3"/>
+        <property name="hostName" value="127.0.0.1"/>
         <property name="port" value="6379"/>
         <property name="poolConfig" ref="jedisPoolConfig"/>
     </bean>

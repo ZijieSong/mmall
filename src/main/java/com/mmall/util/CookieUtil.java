@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class CookieUtil {
     private static final String LOGIN_TOKEN_NAME = "login_token";
-    private static final String LOGIN_TOKEN_DOMAIN = "mmall.com";
+    private static final String LOGIN_TOKEN_DOMAIN = PropertiesUtil.get("login.token.domain");
 
     public static void generateLoginCookie(HttpServletResponse response, String token){
         Cookie cookie = new Cookie(LOGIN_TOKEN_NAME,token);
