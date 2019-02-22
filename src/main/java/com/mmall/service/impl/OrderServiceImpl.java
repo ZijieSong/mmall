@@ -400,29 +400,33 @@ public class OrderServiceImpl implements OrderService {
         //分两步，第一步需要给订单中的商品库存增加，第二部需要更改订单的状态
         Date createDate = DateUtils.addHours(new Date(), -expireHours);
         List<Order> orderList = orderMapper.selectOrderByStatusAndCreateDate(Const.OrderStatus.NO_PAY.getValue(), DateUtil.getStrFromDate(createDate));
-        List<Product> productUpdateList = Lists.newArrayList();
-        List<Order> orderUpdateList = Lists.newArrayList();
-        orderList.forEach(order -> {
-            List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
-            orderItemList.forEach(orderItem -> {
-                Integer stock = productMapper.selectStockById(orderItem.getProductId());
-                //如果查出来的库存为null的话，说明该product不存在也就是被删除了，就不再更新它的库存
-                if(stock!=null) {
-                    Product productUpdate = new Product();
-                    productUpdate.setId(orderItem.getProductId());
-                    productUpdate.setStock(stock+orderItem.getQuantity());
-                    productUpdateList.add(productUpdate);
-                }
+        if(!CollectionUtils.isEmpty(orderList)) {
+            List<Product> productUpdateList = Lists.newArrayList();
+            List<Order> orderUpdateList = Lists.newArrayList();
+            orderList.forEach(order -> {
+                List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
+                orderItemList.forEach(orderItem -> {
+                    Integer stock = productMapper.selectStockById(orderItem.getProductId());
+                    //如果查出来的库存为null的话，说明该product不存在也就是被删除了，就不再更新它的库存
+                    if (stock != null) {
+                        Product productUpdate = new Product();
+                        productUpdate.setId(orderItem.getProductId());
+                        productUpdate.setStock(stock + orderItem.getQuantity());
+                        productUpdateList.add(productUpdate);
+                    }
+                });
+                Order orderUpdate = new Order();
+                orderUpdate.setId(order.getId());
+                orderUpdate.setStatus(Const.OrderStatus.CANCELED.getValue());
+                orderUpdateList.add(orderUpdate);
             });
-            Order orderUpdate = new Order();
-            orderUpdate.setId(order.getId());
-            orderUpdate.setStatus(Const.OrderStatus.CANCELED.getValue());
-            orderUpdateList.add(orderUpdate);
-        });
-        List<Integer> productUpdateId = productUpdateList.stream().map(Product::getId).collect(Collectors.toList());
-        log.info("即将关闭订单编号:{}",Arrays.toString(productUpdateId.toArray()));
-        productMapper.updateStockBatch(productUpdateList);
-        orderMapper.updateStatusBatch(orderUpdateList);
+            List<Integer> productUpdateId = productUpdateList.stream().map(Product::getId).collect(Collectors.toList());
+            log.info("即将关闭订单编号:{}", Arrays.toString(productUpdateId.toArray()));
+            productMapper.updateStockBatch(productUpdateList);
+            orderMapper.updateStatusBatch(orderUpdateList);
+        }else{
+            log.info("没有要关闭的订单");
+        }
     }
 
     private List<OrderVO> generateOrderVOList(List<Order> orderList, Integer userId) {
