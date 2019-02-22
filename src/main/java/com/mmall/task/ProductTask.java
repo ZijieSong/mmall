@@ -32,7 +32,7 @@ public class ProductTask {
         log.info("结束定时关单");
     }
 
-    //    @Scheduled(cron = "0 0/1 * * * ? ")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     public void closeOrderV2() {
         //开始分布式锁的获取
         Long lockExpireTime = Long.valueOf(PropertiesUtil.get("order.close.redisLock.expireTime", "5000"));
@@ -55,7 +55,7 @@ public class ProductTask {
         }
     }
 
-    @Scheduled(cron = "0 0/1 * * * ? ")
+//    @Scheduled(cron = "0 0/1 * * * ? ")
     public void closeOrderV3() {
         //获取分布式锁的可重入锁对象
         RLock rLock = redissonManager.getRedisson().getLock(Const.RedisLockKey.CLOSE_ORDER_LOCK);
@@ -88,13 +88,13 @@ public class ProductTask {
         //首先设置锁的超时时间，防止锁由于操作抛异常而未被删除导致的死锁
         ShardedRedisUtil.expire(Const.RedisLockKey.CLOSE_ORDER_LOCK, millisToSeconds(lockExpireTime));
         log.info("{},开始定时关单", System.currentTimeMillis());
-//        orderService.closeOrder(Integer.valueOf(PropertiesUtil.get("order.expireTime", "2")));
-        //模拟关单操作, 睡1s
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            log.error("sleep exception", e);
-        }
+        orderService.closeOrder(Integer.valueOf(PropertiesUtil.get("order.expireTime", "2")));
+//        模拟关单操作, 睡1s
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            log.error("sleep exception", e);
+//        }
         log.info("{},结束定时关单", System.currentTimeMillis());
         //释放锁
         ShardedRedisUtil.del(Const.RedisLockKey.CLOSE_ORDER_LOCK);
